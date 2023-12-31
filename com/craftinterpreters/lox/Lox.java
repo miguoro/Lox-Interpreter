@@ -12,6 +12,9 @@ import java.util.Scanner;
 import java.util.stream.Stream;
 
 public class Lox {
+
+    static boolean hadError = false; // 处理错误的标识
+
     public static void main(String[] args) throws IOException {
         if (args.length > 1) {
             System.out.println("Usage: jlox [scripts]");
@@ -33,6 +36,9 @@ public class Lox {
     private static void runFile(String file) throws IOException {
         var bytes = Files.readAllBytes(Paths.get(file));
         run(new String(bytes, Charset.defaultCharset()));
+        if (hadError) {
+            System.exit(65); // 运行批处理文件如果报错，则直接退出
+        }
     }
 
     /**
@@ -49,6 +55,8 @@ public class Lox {
                 break; // 若输入代码为空，则退出
             }
             run(line);
+            hadError = false; // 交互式命令编程，发生错误不应该退出交互式模式，而是应该重置错误标识。
+
         }
 
     }
@@ -65,6 +73,30 @@ public class Lox {
         for (Token token : tokens) {
             System.out.println(token);
         }
+    }
+
+    /**
+     * 错误逻辑方法
+     * 
+     * @param line    错误所在行
+     * @param message 错误信息
+     */
+    static void error(int line, String message) {
+        report(line, "", message);
+    }
+
+    /**
+     * 错误报告方法
+     * 
+     * @param line    错误所在行
+     * @param where   错误所在位置
+     * @param message 错误信息
+     */
+    private static void report(int line, String where, String message) {
+        System.err.println(
+                "[line " + line + "] Error" + where + ":" + message); // 输出错误形式：[line 32] Error in function run :
+                                                                      // Illegal comma.
+        hadError = true;
     }
 
 }
