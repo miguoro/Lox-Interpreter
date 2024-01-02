@@ -51,12 +51,12 @@ class Scanner {
     }
 
     /**
-     * 匹配词素
+     * 匹配并识别词素
      */
     private void scansToken() {
         char c = advance();
         switch (c) {
-            // 判断由单个字符组成的词素
+            // 判断词素是否是由单个字符组成的标记
             case '(':
                 addToken(LEFT_PAREN);
                 break;
@@ -88,7 +88,7 @@ class Scanner {
             case '*':
                 addToken(STAR);
                 break;
-            // 判断可能由一个或者两个字符组成的词素
+            // 判断词素是否是由一个或者两个字符组成的标记
             case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
@@ -101,7 +101,7 @@ class Scanner {
             case '<':
                 addToken(match('=') ? LESS_EQUAL : LESS);
                 break;
-            // '/'词素需要单独识别，因为它有可能是'//'注释词素
+            // '/'标记需要单独识别，因为它有可能是'//'注释
             case '/':
                 if (match('/')) {
                     // 注释代码需要忽略
@@ -127,7 +127,7 @@ class Scanner {
     }
 
     /**
-     * 辅助 判断可能由一个或者两个字符组成的词素
+     * 辅助 判断可能由一个或者两个字符组成的标记
      * 
      * @param c
      * @return
@@ -165,7 +165,7 @@ class Scanner {
     }
 
     /**
-     * 将词素加入词素列表中
+     * 将识别出来的标记加入标记列表中
      * 
      * @param type TokenType
      */
@@ -174,7 +174,7 @@ class Scanner {
     }
 
     /**
-     * 将词素加入词素列表中
+     * 将识别出来的标记加入标记列表中
      * 
      * @param type
      * @param literal 字面量
