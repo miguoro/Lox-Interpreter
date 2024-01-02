@@ -16,7 +16,7 @@ import static com.craftinterpreters.lox.TokenType.*;
  */
 class Scanner {
     private final String source;
-    private final ArrayList<Token> tokens = new ArrayList<>();
+    private final ArrayList<Token> tokens = new ArrayList<>(); // 词素列表
 
     private int start = 0;
     private int current = 0;
@@ -56,7 +56,7 @@ class Scanner {
     private void scansToken() {
         char c = advance();
         switch (c) {
-            // 判断由单个字符组成的标识符
+            // 判断由单个字符组成的词素
             case '(':
                 addToken(LEFT_PAREN);
                 break;
@@ -88,7 +88,7 @@ class Scanner {
             case '*':
                 addToken(STAR);
                 break;
-            // 判断可能由一个或者两个字符组成的标识符
+            // 判断可能由一个或者两个字符组成的词素
             case '!':
                 addToken(match('=') ? BANG_EQUAL : BANG);
                 break;
@@ -101,7 +101,7 @@ class Scanner {
             case '<':
                 addToken(match('=') ? LESS_EQUAL : LESS);
                 break;
-            // '/'标识需要单独识别，因为它有可能是'//'注释标识
+            // '/'词素需要单独识别，因为它有可能是'//'注释词素
             case '/':
                 if (match('/')) {
                     // 注释代码需要忽略
@@ -111,12 +111,12 @@ class Scanner {
                     addToken(SLASH);
                 }
                 break;
-            // 跳过无意义的字符.直接开始扫描识别下一个标识
+            // 跳过无意义的字符.直接开始扫描识别下一个词素
             case ' ':
             case '\t':
             case '\r':
                 break;
-            // 跳过无意义的字符.直接开始扫描识别下一个标识。跳过换行字符需要递增行数。
+            // 跳过无意义的字符.直接开始扫描识别下一个词素。跳过换行字符需要递增行数。
             case '\n':
                 line++;
                 break;
@@ -127,7 +127,7 @@ class Scanner {
     }
 
     /**
-     * 辅助 判断可能由一个或者两个字符组成的标识符
+     * 辅助 判断可能由一个或者两个字符组成的词素
      * 
      * @param c
      * @return
@@ -165,7 +165,7 @@ class Scanner {
     }
 
     /**
-     * 将标识加入标识列表中
+     * 将词素加入词素列表中
      * 
      * @param type TokenType
      */
@@ -174,7 +174,7 @@ class Scanner {
     }
 
     /**
-     * 将标识加入标识列表中
+     * 将词素加入词素列表中
      * 
      * @param type
      * @param literal 字面量
