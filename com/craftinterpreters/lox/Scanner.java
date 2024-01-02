@@ -54,7 +54,134 @@ class Scanner {
      * 匹配词素
      */
     private void scansToken() {
-        // TODO:
+        char c = advance();
+        switch (c) {
+            // 判断由单个字符组成的标识符
+            case '(':
+                addToken(LEFT_PAREN);
+                break;
+            case ')':
+                addToken(RIGHT_PAREN);
+                break;
+            case '{':
+                addToken(LEFT_BRACE);
+                break;
+            case '}':
+                addToken(RIGHT_BRACE);
+                break;
+            case ',':
+                addToken(COMMA);
+                break;
+            case '.':
+                addToken(DOT);
+                break;
+            case '-':
+
+                addToken(MINUS);
+                break;
+            case '+':
+                addToken(PLUS);
+                break;
+            case ';':
+                addToken(SEMICOLON);
+                break;
+            case '*':
+                addToken(STAR);
+                break;
+            // 判断可能由一个或者两个字符组成的标识符
+            case '!':
+                addToken(match('=') ? BANG_EQUAL : BANG);
+                break;
+            case '=':
+                addToken(match('=') ? EQUAL_EQUAL : EQUAL);
+                break;
+            case '>':
+                addToken(match('=') ? GREATER_EQUAL : GREATER);
+                break;
+            case '<':
+                addToken(match('=') ? LESS_EQUAL : LESS);
+                break;
+            // '/'标识需要单独识别，因为它有可能是'//'注释标识
+            case '/':
+                if (match('/')) {
+                    // 注释代码需要忽略
+                    while (peek() != '\n' && isAtEnd()) // 要求peek预读的字符不是换行符，因为换行符会在后文进行识别。
+                        advance();
+                } else {
+                    addToken(SLASH);
+                }
+                break;
+            // 跳过无意义的字符.直接开始扫描识别下一个标识
+            case ' ':
+            case '\t':
+            case '\r':
+                break;
+            // 跳过无意义的字符.直接开始扫描识别下一个标识。跳过换行字符需要递增行数。
+            case '\n':
+                line++;
+                break;
+            default:
+                Lox.error(line, "Unexpected character.");
+                break;
+        }
+    }
+
+    /**
+     * 辅助 判断可能由一个或者两个字符组成的标识符
+     * 
+     * @param c
+     * @return
+     */
+    private boolean match(char expected) {
+        if (isAtEnd() || source.charAt(current) != expected)
+            return false;
+
+        current++;
+        return true;
+
+    }
+
+    /**
+     * lookahead(前瞻)函数。又称预读函数。前瞻函数不会消费字符。
+     * 消费字符的意思：advance中的current++操作。即移动指针跳过一个字符。
+     * 
+     * @return 返回当前指针的后一个字符。
+     */
+    private char peek() {
+        if (isAtEnd()) {
+            return '\0';
+        }
+        return source.charAt(current);
+    }
+
+    /**
+     * 递进并返回一个字符
+     * 
+     * @return 一个字符
+     */
+    private char advance() {
+        current++;
+        return source.charAt(current - 1);
+    }
+
+    /**
+     * 将标识加入标识列表中
+     * 
+     * @param type TokenType
+     */
+    private void addToken(TokenType type) {
+        addToken(type, null);
+    }
+
+    /**
+     * 将标识加入标识列表中
+     * 
+     * @param type
+     * @param literal 字面量
+     */
+    private void addToken(TokenType type, Object literal) {
+        String text = source.substring(start, current);
+        tokens.add(new Token(type, text, literal, line));
     }
 
 }
