@@ -120,10 +120,67 @@ class Scanner {
             case '\n':
                 line++;
                 break;
+            // 处理字面量
+            case '"':
+                string();
+                break;
             default:
-                Lox.error(line, "Unexpected character.");
+                // 处理数字字面量
+                // 放在default分支里以避免写多个case
+                if (isDigit(c)) {
+                    number();
+                } else {
+                    Lox.error(line, "Unexpected character.");
+                }
                 break;
         }
+    }
+
+    /**
+     * 辅助 判断预读字符是不是数字
+     * 
+     * @return
+     */
+    private boolean isDigit(char c) {
+        if (c >= '0' && c <= '9')
+            return true;
+        return false;
+    }
+
+    /**
+     * 辅助 处理数字字面量
+     */
+    private void number() {
+        while (isDigit(peek())) {
+            advance();
+        }
+        if (peek() == '.' && isDigit(peekNext())) {
+            advance();
+            while (isDigit(peek())) {
+                advance();
+            }
+        }
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
+    }
+
+    /**
+     * 辅助 处理字符串字面量
+     */
+    private void string() {
+
+        while (peek() != '"' && !isAtEnd()) {
+            if (peek() == '\n') {
+                line++;
+            }
+            advance();
+        }
+        if (isAtEnd()) {
+            Lox.error(line, "Unterminated string.");
+            return;
+        }
+        advance(); // 右双引号
+        String value = source.substring(start + 1, current - 1); // 省略双引号
+        addToken(STRING, value);
     }
 
     /**
@@ -152,6 +209,19 @@ class Scanner {
             return '\0';
         }
         return source.charAt(current);
+    }
+
+    /**
+     * lookahead(前瞻)函数。又称预读函数。前瞻函数不会消费字符。
+     * 预读两个字符。
+     * 
+     * @return
+     */
+    private char peekNext() {
+        if (current + 1 >= source.length()) {
+            return '\0';
+        }
+        return source.charAt(current + 1);
     }
 
     /**

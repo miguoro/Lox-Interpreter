@@ -8,8 +8,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.Charset;
 import java.util.List;
-import java.util.Scanner;
 import java.util.stream.Stream;
+import com.craftinterpreters.lox.Scanner;
 
 public class Lox {
 
@@ -68,7 +68,7 @@ public class Lox {
      */
     private static void run(String source) {
         Scanner scanner = new Scanner(source);
-        List<Token> tokens = scanner.scanTokens();// TODO: 1 标记类 Token 之后写； 2 Scanner类 中没有定义scanTokens方法，之后补充。
+        List<Token> tokens = scanner.scansTokens();// TODO: 1 标记类 Token 之后写； 2 Scanner类 中没有定义scanTokens方法，之后补充。
         // TODO: tokens的处理目前只是简单的打印出来。
         for (Token token : tokens) {
             System.out.println(token);
