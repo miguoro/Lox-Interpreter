@@ -3,6 +3,7 @@ package com.craftinterpreters.lox;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.HashMap;
 
 import static com.craftinterpreters.lox.TokenType.*;
@@ -24,6 +25,31 @@ class Scanner {
 
     public Scanner(String source) {
         this.source = source;
+    }
+
+    /**
+     * 保留字哈希列表
+     */
+    private static final Map<String, TokenType> keywords;
+
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", AND);
+        keywords.put("class", CLASS);
+        keywords.put("else", ELSE);
+        keywords.put("false", FALSE);
+        keywords.put("for", FOR);
+        keywords.put("fun", FUN);
+        keywords.put("if", IF);
+        keywords.put("nil", NIL);
+        keywords.put("or", OR);
+        keywords.put("print", PRINT);
+        keywords.put("return", RETURN);
+        keywords.put("super", SUPER);
+        keywords.put("this", THIS);
+        keywords.put("true", TRUE);
+        keywords.put("var", VAR);
+        keywords.put("while", WHILE);
     }
 
     /**
@@ -129,11 +155,62 @@ class Scanner {
                 // 放在default分支里以避免写多个case
                 if (isDigit(c)) {
                     number();
+                } else if (isAlpha(c)) {
+                    identifier();
                 } else {
                     Lox.error(line, "Unexpected character.");
                 }
                 break;
         }
+    }
+
+    /**
+     * 辅助 处理官方或者自定义的标识符
+     */
+    private void identifier() {
+        while (isAlphaNumber(peek()) && !isAtEnd()) {
+            advance();
+        }
+        var keyword = source.subSequence(start, current);
+        var type = keywords.get(keyword);
+        if (type == null) {
+            addToken(IDENTIFIER);
+        } else {
+            addToken(type);
+        }
+
+    }
+
+    /**
+     * 辅助 判断字符是否为字母或者下划线开头
+     * 
+     * @param c
+     * @return 布尔
+     */
+    private boolean isAlpha(char c) {
+        if (c >= 'a' && c <= 'z') {
+            return true;
+        } else if (c >= 'A' && c <= 'Z') {
+            return true;
+        } else if (c == '_') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * 辅助 判断是否是字母或者数字或者下划线
+     * 
+     * @param c
+     * @return
+     */
+    private boolean isAlphaNumber(char c) {
+        if (isAlpha(c)) {
+            return true;
+        } else if (isDigit(c)) {
+            return true;
+        }
+        return false;
     }
 
     /**
